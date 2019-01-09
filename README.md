@@ -7,7 +7,7 @@ Handles orders, pre-orders, stock and preparation for a cafeteria with a web-bas
 - `Node.js` >=10
 	- `express` and `express-ws`
 	- `ejs`
-	- `sqlite`
+	- `better-sqlite3`
 - A recent web browser supporting WebSockets
 
 ## Licence
