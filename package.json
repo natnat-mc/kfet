@@ -1,0 +1,22 @@
+{
+  "name": "kfet",
+  "version": "1.0.0",
+  "description": "The software for the KFet Info, next version",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natnat-mc/kfet.git"
+  },
+  "author": "Nathan DECHER",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/natnat-mc/kfet/issues"
+  },
+  "homepage": "https://github.com/natnat-mc/kfet#readme"
+}
