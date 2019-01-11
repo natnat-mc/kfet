@@ -1,6 +1,10 @@
 {
 	"env": {
 		"PORT": 3000
+	},
+	
+	"db": {
+		"filename": "data/db.sqlite"
 	}
 }
 
