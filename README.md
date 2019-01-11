@@ -8,6 +8,9 @@ Handles orders, pre-orders, stock and preparation for a cafeteria with a web-bas
 	- `express` and `express-ws`
 	- `ejs`
 	- `better-sqlite3`
+	- `log` and `log-node`
+	- `semver`
+	- `less` *as a devDependency, not required for running the program*
 - A recent web browser supporting WebSockets
 
 ## Licence
