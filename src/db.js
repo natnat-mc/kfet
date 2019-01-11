@@ -23,6 +23,12 @@ try {
 	log.info("Created database from sql file");
 }
 
+// add close handlers
+process.on('exit', () => db.close());
+process.on('SIGINT', () => db.close());
+process.on('SIGHUP', () => db.close());
+process.on('SIGTERM', () => db.close());
+
 // execute db migrations automatically
 (() => {
 	const migrations=JSON.parse(fs.readFileSync('sql/migrations.json'));
