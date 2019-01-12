@@ -19,6 +19,11 @@ shared.config=function(namespace, key) {
 	return config[namespace][key];
 };
 
+// create global event emitter
+const EE=require('events');
+const events=new EE();
+shared.events=events;
+
 // load database
 require('./src/db');
 
@@ -26,12 +31,10 @@ require('./src/db');
 require('./src/express');
 
 // setup signal handlers to exit
-((a => {
-	[].forEach.call(['int', 'term', 'hup'], a);
-})(s => {
+['int', 'term', 'hup'].forEach(s => {
 	s='SIG'+s.toUpperCase();
 	process.on(s, () => {
-		log.notice("Exiting on "+s);
-		process.exit(0);
+		log.notice("Exiting due to "+s);
+		events.emit('die', s);
 	});
-}));
+});

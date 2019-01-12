@@ -24,10 +24,10 @@ try {
 }
 
 // add close handlers
-process.on('exit', () => db.close());
-process.on('SIGINT', () => db.close());
-process.on('SIGHUP', () => db.close());
-process.on('SIGTERM', () => db.close());
+shared.events.on('die', () => {
+	db.close();
+	log.notice("Closed database");
+});
 
 // execute db migrations automatically
 (() => {
@@ -57,7 +57,7 @@ process.on('SIGTERM', () => db.close());
 	}
 });
 
-log.info("Database is ready");
+log.notice("Database is ready");
 
 shared.db=db;
 module.exports=db;
