@@ -6,6 +6,9 @@
 	
 	"db": {
 		"filename": "data/db.sqlite"
+	},
+	"log": {
+		"filename": "kfet.log"
 	}
 }
 

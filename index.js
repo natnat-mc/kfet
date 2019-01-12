@@ -4,7 +4,6 @@ const log=require('log').get('index');
 
 // load config
 const config=require('./config');
-log.info("Loaded configuration file");
 
 // load evironment variables
 let env=Object.assign({}, config.env, process.env);
@@ -16,13 +15,16 @@ process.chdir(__dirname);
 // load shared file
 const shared=require('./shared');
 shared.config=function(namespace, key) {
-	return config[namespace][key];
+	return (config[namespace] || {})[key];
 };
 
 // create global event emitter
 const EE=require('events');
 const events=new EE();
 shared.events=events;
+
+// load logger
+require('./src/logger')(shared.config('log', 'filename'), shared.config('log', 'mode'));
 
 // load database
 require('./src/db');

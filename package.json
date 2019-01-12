@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js 2>&1 | tee -a kfet.log",
-    "daemon": "nohup node index.js 2>&1 >> kfet.log&"
+    "start": "node index.js",
+    "daemon": "nohup node index.js 2>&1 >/dev/null &"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "express-ws": "^4.0.0",
     "log": "^3.2.0",
     "log-node": "^3.2.1",
+    "printf": "^0.5.1",
     "semver": "^5.6.0"
   },
   "devDependencies": {
