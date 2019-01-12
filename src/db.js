@@ -32,11 +32,14 @@ shared.events.on('die', () => {
 // execute db migrations automatically
 (() => {
 	const migrations=JSON.parse(fs.readFileSync('sql/migrations.json'));
-	const getVersion=db.prepare('SELECT value FROM dbInfo WHERE key=\'version\'');
-	getVersion.pluck(true);
+	const getVersion=db.prepare('SELECT value FROM dbInfo WHERE key=\'version\';');
+	getVersion.pluck();
 	let version=getVersion.get();
-	if(semver.eq(version, migrations.versions)) {
+	let count=0;
+	if(semver.eq(version, migrations.version)) {
 		log.info("Database is already up to date");
+	} else {
+		log.info("We're at version %s and need to upgrade to %s", version, migrations.version);
 	}
 	while(semver.lt(version, migrations.version)) {
 		let migration=migrations[version];
@@ -54,8 +57,10 @@ shared.events.on('die', () => {
 			}
 		});
 		version=getVersion.get();
+		count++;
 	}
-});
+	log.debug("Applied %d migration(s)", count);
+})();
 
 log.notice("Database is ready");
 
