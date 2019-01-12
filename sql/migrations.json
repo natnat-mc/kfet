@@ -1,3 +1,8 @@
 {
-	"version": "0.0.0"
+	"version": "1.0.0",
+	
+	"0.0.0": [
+		"1.0.0.sql",
+		"UPDATE dbInfo SET value='1.0.0' WHERE key='version';"
+	]
 }

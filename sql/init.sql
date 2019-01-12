@@ -1,7 +1,7 @@
 /* create database info table */
 CREATE TABLE dbInfo (
-	key VARCHAR PRIMARY KEY,
-	value VARCHAR
+	key STRING PRIMARY KEY,
+	value STRING
 );
 INSERT
 	INTO dbInfo(key, value)
