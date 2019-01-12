@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/natnat-mc/kfet#readme",
   "dependencies": {
+    "bcrypt": "^3.0.3",
     "better-sqlite3": "^5.2.1",
     "ejs": "^2.6.1",
     "express": "^4.16.4",

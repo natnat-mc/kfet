@@ -66,3 +66,16 @@ log.notice("Database is ready");
 
 shared.db=db;
 module.exports=db;
+
+// allow the db to read statements automatically from disk
+(() => {
+	const statements=Object.create(null);
+	module.exports.loadStat=function(name) {
+		if(statements[name]) {
+			return statements[name];
+		}
+		const code=fs.readFileSync('sql/'+name+'.sql', 'utf8');
+		statements[name]=db.prepare(code);
+		return statements[name];
+	};
+})();

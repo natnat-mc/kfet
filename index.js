@@ -26,11 +26,10 @@ shared.events=events;
 // load logger
 require('./src/logger')(shared.config('log', 'filename'), shared.config('log', 'mode'));
 
-// load database
-require('./src/db');
-
 // load everything
+require('./src/db');
 require('./src/express');
+require('./src/auth');
 
 // setup signal handlers to exit
 ['int', 'term', 'hup'].forEach(s => {

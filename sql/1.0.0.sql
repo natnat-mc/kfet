@@ -3,14 +3,13 @@ CREATE TABLE accounts (
 	id INTEGER PRIMARY KEY,
 	username STRING UNIQUE NOT NULL,
 	password BLOB NOT NULL,
-	salt BLOB NOT NULL,
-	addDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	addDate INTEGER DEFAULT (strftime('%s', 'now'))
 );
 
 /* and session cookies too */
 CREATE TABLE cookies ( /* https://i.imgur.com/Y9i11Rx.jpg */
 	user INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
-	value BLOB NOT NULL,
+	value BLOB PRIMARY KEY,
 	expires TIMESTAMP NOT NULL
 );
 
