@@ -9,5 +9,5 @@ app.set('views', process.cwd()+'/views'); // allow EJS views to be loaded
 app.use(express.static(process.cwd()+'/static')); // allow static resources to be served
 
 // listen on either the port given in env (or loaded from config) or 3000
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3000, process.env.ADDRESS || '0.0.0.0');
 
