@@ -24,6 +24,8 @@ Handles orders, pre-orders, stock and preparation for a cafeteria with a web-bas
 	- `better-sqlite3`
 	- `log` and `log-node`
 	- `semver`
+	- `printf`
+	- `bcrypt`
 	- `less` *as a devDependency, not required for running the program*
 - A recent web browser supporting WebSockets
 
