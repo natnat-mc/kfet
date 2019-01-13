@@ -7,6 +7,7 @@ const shared=require('../shared');
 // some setup
 const rounds=8; // enough to be secure, but not slow
 const duration=1000*60*60*24*7; // a week
+module.exports.duration=duration;
 
 // load the statements
 const getUserByName=db.loadStat('getFullUserByName');
@@ -20,8 +21,10 @@ const createUser=db.loadStat('createUser');
 module.exports.authUser=function(name, password) {
 	let user=getUserByName.get(name);
 	if(user && bcrypt.compareSync(password, user.password.toString('utf8'))) {
+		log.debug('Successfully authenticated user %s', user.username)
 		return user;
 	} else {
+		log.debug("Failed to authenticate user %s", name);
 		return false;
 	}
 };
@@ -40,13 +43,14 @@ module.exports.checkCookie=function(hash) {
 module.exports.createCookie=function(user) {
 	let hash;
 	return bcrypt.genSalt(rounds).then(salt => {
-		return bcrypt.hash(Date.now()+user.id, salt);
+		return bcrypt.hash(Date.now()+''+user.id, salt);
 	}).then(str => {
 		hash=str;
 		return Buffer.from(str, 'utf8');
 	}).then(buf => {
 		return createCookie.run({user: user.id, value: buf, expires: Date.now()+duration});
 	}).then(() => {
+		log.debug("Successfully created cookie for user #%d", user.id);
 		return hash;
 	});
 };
@@ -60,6 +64,7 @@ module.exports.createUser=function(username, password) {
 		user.password=Buffer.from(hash, 'utf8');
 		return createUser.run(user);
 	}).then(status => {
+		log.info("Successfully created user %s with id #%d", username, status.lastInsertRowid);
 		return getUserById.get(status.lastInsertRowid);
 	});
 };
