@@ -1,3 +1,4 @@
 data/db.sqlite
 node_modules/
 kfet.log
+.*.swp
