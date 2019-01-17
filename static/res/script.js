@@ -1,0 +1,1 @@
+const _G={}; window._G=_G;

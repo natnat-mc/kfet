@@ -1,0 +1,21 @@
+<div id="loginBox">
+	<% if(session) { %>
+		<span>
+			Hello <span id="username"><%= session.username %></span>!
+			<a href="/api/logout" id="logoutButton">Logout</a>
+		</span>
+	<% } else { %>
+		<form action="/api/login" method="POST">
+			<label for="login">Login</label>
+			<input name="login" placeholder="login" type="text" id="loginField" />
+			
+			<label for="password">Password</label>
+			<input name="password" placeholder="password" type="password" id="passwordField" />
+			
+			<label for="rememberme">Remember me</label>
+			<input name="rememberme" type="checkbox" id="remembermeBox" />
+			
+			<input type="submit" id="loginButton" value="Log In" /> or <a href="/register" id="registerButton" >register</a>
+		</form>
+	<% } %>
+</div>

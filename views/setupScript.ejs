@@ -1,0 +1,14 @@
+<script>
+<% if(session) { %>
+	const session=JSON.parse("<%- JSON.stringify(session).replace(/"/g, '\\\"') %>");
+<% } else { %>
+	const session=undefined;
+<% } %>
+(() => {
+	const scr=document.createElement('script');
+	scr.setAttribute('src', '/res/script.js');
+	window.onload=() => {
+		document.head.appendChild(scr);
+	};
+})();
+</script>

@@ -1,0 +1,42 @@
+#loginBox {
+	display: flex;
+	flex-direction: row;
+	
+	position: sticky;
+	top: 0;
+	
+	width: 100%;
+	height: 26px;
+	padding: 2px;
+	box-sizing: border-box;
+	
+	background-color: #variables.colors[primary];
+	
+	justify-content: flex-start;
+	align-items: center;
+	
+	form {
+		display: block;
+		
+		width: 100%;
+		height: 100%;
+		
+		label {
+			&::after {
+				content: ": ";
+			}
+		}
+		input {
+			&:not([type="submit"]) {
+				margin-right: 5px;
+			}
+			&[type="submit"] {
+				.reset();
+			}
+		}
+	}
+	
+	#logoutButton, #registerButton, #loginButton {
+		color: #variables.colors[secondary];
+	}
+}

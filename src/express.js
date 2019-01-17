@@ -31,6 +31,7 @@ app.use((req, res, next) => {
 			res.cookie('session', '', {maxAge: -1000*60*60*24});
 		}
 	}
+	res.locals.session=req.session;
 	next();
 });
 app.post('/api/login', async (req, res) => {
@@ -45,20 +46,32 @@ app.post('/api/login', async (req, res) => {
 			let cookie=await auth.createCookie(user);
 			res.cookie('session', cookie, req.body.rememberme?{maxAge: auth.duration}:undefined);
 			// redirect them to where they came from
-			res.redirect('back').end();
+			res.redirect('back');
 		} else {
 			//TODO render some kind of error page
 			return res.status(401).render('loginError', {
 				login: req.body.login
-			}).end();
+			});
 		}
 	} else {
 		//TODO what the fuck did they even mean to do?
 		return res.status(400).render('genericError', {
 			short: "WTF",
 			message: "Why did you try to log in without any login/password combo?"
-		}).end();
+		});
 	}
+});
+app.all('/api/logout', (req, res) => {
+	// delete the session cookie
+	res.cookie('session', '', {maxAge: -1000*60*60*24});
+	//TODO delete it from db too
+	// redirect them to where they came from
+	res.redirect('back');
+});
+
+//NOTICE this is debug only
+app.get('/', (req, res) => {
+	return res.status(200).render('loginBoxTest');
 });
 
 // listen on either the port given in env (or loaded from config) or 3000

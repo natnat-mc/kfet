@@ -9,7 +9,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "daemon": "nohup node index.js 2>&1 >/dev/null &"
+    "daemon": "nohup node index.js 2>&1 >/dev/null &",
+    "buildLess": "lessc src/less/index.less static/res/styles.css",
+    "buildJs": "node tools/combine.js",
+    "build": "npm run buildLess && npm run buildJs"
   },
   "repository": {
     "type": "git",
