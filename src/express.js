@@ -26,9 +26,11 @@ app.use((req, res, next) => {
 		if(user) {
 			// if it's genuine, use it as our session
 			req.session=user;
+			log.debug('found valid cookie for user %s', user.username);
 		} else {
 			// if it isn't, delete it
 			res.cookie('session', '', {maxAge: -1000*60*60*24});
+			log.debug('found invalid cookie: %s', req.cookies['session']);
 		}
 	}
 	res.locals.session=req.session;
@@ -45,10 +47,11 @@ app.post('/api/login', async (req, res) => {
 			// give them a cookie
 			let cookie=await auth.createCookie(user);
 			res.cookie('session', cookie, req.body.rememberme?{maxAge: auth.duration}:undefined);
-			// redirect them to where they came from
 			res.redirect('back');
+			log.info('User %s logged in', user.username);
 		} else {
 			//TODO render some kind of error page
+			log.info('Failed login attempt as %s', req.body.login);
 			return res.status(401).render('loginError', {
 				login: req.body.login
 			});
