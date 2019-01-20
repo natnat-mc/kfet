@@ -18,6 +18,12 @@ app.set('views', process.cwd()+'/views'); // allow EJS views to be loaded
 app.set('view engine', 'ejs'); // set express to use EJS by default
 app.use(express.static(process.cwd()+'/static')); // allow static resources to be served
 
+
+// use the API and the WebUI
+require('./api')(app);
+require('./webui')(app);
+
+/*
 // use authenticator
 app.use((req, res, next) => {
 	// check if we have a session cookie
@@ -76,6 +82,7 @@ app.all('/api/logout', (req, res) => {
 app.get('/', (req, res) => {
 	return res.status(200).render('loginBoxTest');
 });
+*/
 
 // listen on either the port given in env (or loaded from config) or 3000
 const server=app.listen(process.env.PORT || 3000, process.env.ADDRESS || '0.0.0.0', () => {
