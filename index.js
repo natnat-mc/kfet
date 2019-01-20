@@ -32,10 +32,16 @@ require('./src/express');
 require('./src/auth');
 
 // setup signal handlers to exit
+let dying=false;
 ['int', 'term', 'hup'].forEach(s => {
 	s='SIG'+s.toUpperCase();
 	process.on(s, () => {
+		if(dying) {
+			return log.warn("Already dying!");
+		}
+		dying=true;
 		log.notice("Exiting due to "+s);
 		events.emit('die', s);
+		setTimeout(process.exit, 1000, 0).unref();
 	});
 });
