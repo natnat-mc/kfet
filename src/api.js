@@ -9,7 +9,7 @@ const {config}=shared;
 module.exports=exports=function(app) {
 	log.info("setting up API");
 	
-	// use cookie as token if present
+	// use cookie or header as token if present
 	app.use((req, res, next) => {
 		if(req.cookies.session) {
 			// use the cookie as token
@@ -19,6 +19,12 @@ module.exports=exports=function(app) {
 			
 			// flag the request as coming from the WebUI and not a server
 			req.webui=true;
+		}
+		if(req.get('Token')) {
+			// use the header as token
+			log.debug("using header as token: %s", req.get('Token'));
+			if(!req.query) req.query={};
+			if(!req.query.token) req.query.token=req.get('Token');
 		}
 		next();
 	});
