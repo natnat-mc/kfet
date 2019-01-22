@@ -1,7 +1,7 @@
 <div id="loginBox">
-	<% if(session) { %>
+	<% if(session && session.scopes.includes('user')) { %>
 		<span>
-			Hello <span id="username"><%= session.username %></span>!
+			Hello <span id="username"><%= session.user.username %></span>!
 			<a href="/api/logout" id="logoutButton">Logout</a>
 		</span>
 	<% } else { %>

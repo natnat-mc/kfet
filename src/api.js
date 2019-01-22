@@ -4,6 +4,10 @@ const auth=require('./auth');
 const db=require('./db');
 const shared=require('../shared');
 const {config}=shared;
+const ms=require('ms');
+
+// load statements
+const getUserById=db.loadStat('getUserById');
 
 // setup entrypoint
 module.exports=exports=function(app) {
@@ -31,12 +35,15 @@ module.exports=exports=function(app) {
 	
 	// read token and get session
 	app.use((req, res, next) => {
-		//FIXME use actual tokens (#15, #16)
 		if(req.query.token) {
-			let user=auth.checkCookie(req.query.token);
-			if(user) {
+			let token=auth.validateToken(req.query.token);
+			if(token) {
+				let user=getUserById.get(token.user);
 				log.debug("found valid cookie for user %s", user.username);
-				res.locals.session=user;
+				res.locals.session={
+					user,
+					scopes: token.scopes
+				};
 			} else {
 				// send an error message
 				if(req.webui) {
@@ -65,8 +72,8 @@ module.exports=exports=function(app) {
 				// save their session
 				req.session=user;
 				// give them a cookie
-				let cookie=await auth.createCookie(user);
-				res.cookie('session', cookie, req.body.rememberme?{maxAge: auth.duration}:undefined);
+				let cookie=await auth.createToken(['user'], user);
+				res.cookie('session', cookie, req.body.rememberme?{maxAge: ms(auth.duration)-ms('1h')}:undefined);
 				res.redirect('back');
 				log.info('User %s logged in', user.username);
 			} else {

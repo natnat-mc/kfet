@@ -9,6 +9,10 @@
 	},
 	"log": {
 		"filename": "kfet.log"
+	},
+	"crypto": {
+		"rounds": 8,
+		"secret": ",ko,fksù,vmlknjmq,kfù,qkvnoq"
 	}
 }
 

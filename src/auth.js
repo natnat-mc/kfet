@@ -3,19 +3,24 @@ const db=require('./db');
 const log=require('log').get('auth');
 const bcrypt=require('bcrypt');
 const shared=require('../shared');
+const {config}=shared;
+const jwt=require('jsonwebtoken');
 
 // some setup
-const rounds=8; // enough to be secure, but not slow
-const duration=1000*60*60*24*7; // a week
+const duration='7d'; // a week
+const secret=config('crypto', 'secret');
+const rounds=config('crypto', 'rounds');
 module.exports.duration=duration;
 
 // load the statements
 const getUserByName=db.loadStat('getFullUserByName');
 const getUserById=db.loadStat('getUserById');
-const getCookie=db.loadStat('getCookie');
-const cleanCookies=db.loadStat('cleanCookies');
-const createCookie=db.loadStat('createCookie');
 const createUser=db.loadStat('createUser');
+const getScopes=db.loadStat('getScopes');
+
+// load the scopes
+const scopes=getScopes.all();
+module.exports.scopes=scopes;
 
 // authenticate a user
 module.exports.authUser=function(name, password) {
@@ -29,29 +34,18 @@ module.exports.authUser=function(name, password) {
 	}
 };
 
-// validate a cookie
-module.exports.checkCookie=function(hash) {
-	cleanCookies.run()
-	let cookie=getCookie.get(Buffer.from(hash, 'utf8'));
-	if(cookie) {
-		return getUserById.get(cookie.user);
-	}
-	return false;
+// validate a JWT
+module.exports.validateToken=function(token) {
+	return jwt.verify(token, secret);
 };
 
-// create a cookie
-module.exports.createCookie=function(user) {
-	let hash;
-	return bcrypt.genSalt(rounds).then(salt => {
-		return bcrypt.hash(Date.now()+''+user.id, salt);
-	}).then(str => {
-		hash=str;
-		return Buffer.from(str, 'utf8');
-	}).then(buf => {
-		return createCookie.run({user: user.id, value: buf, expires: Date.now()+duration});
-	}).then(() => {
-		log.debug("Successfully created cookie for user #%d", user.id);
-		return hash;
+// issue a JWT
+module.exports.createToken=function(scopes, user) {
+	return jwt.sign({
+		scopes,
+		user: user.id,
+	}, secret, {
+		expiresIn: duration
 	});
 };
 
