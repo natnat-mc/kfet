@@ -17,6 +17,7 @@ app.use(require('compression')()); // compress requests
 app.set('views', process.cwd()+'/views'); // allow EJS views to be loaded
 app.set('view engine', 'ejs'); // set express to use EJS by default
 app.use(express.static(process.cwd()+'/static')); // allow static resources to be served
+app.use('/views', express.static(process.cwd()+'/views')); // allow views to be served
 
 
 // use the API and the WebUI
