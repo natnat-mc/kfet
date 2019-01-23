@@ -8,6 +8,7 @@ const ms=require('ms');
 
 // load statements
 const getUserById=db.loadStat('getUserById');
+const getPermForUser=db.loadStat('getPermForUser');
 
 // setup entrypoint
 module.exports=exports=function(app) {
@@ -38,10 +39,19 @@ module.exports=exports=function(app) {
 		if(req.query.token) {
 			let token=auth.validateToken(req.query.token);
 			if(token) {
-				let user=getUserById.get(token.user);
-				log.debug("found valid cookie for user %s", user.username);
+				let user, perm;
+				if(token.user) {
+					user=getUserById.get(token.user);
+					perm={};
+					getPermForUser.all(token.user).forEach(function({id, name}) {
+						perm.name=true;
+						perm.id=true;
+					});
+				}
 				res.locals.session={
 					user,
+					perm,
+					token,
 					scopes: token.scopes
 				};
 			} else {
