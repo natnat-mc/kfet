@@ -9,6 +9,7 @@ const ms=require('ms');
 // load statements
 const getUserById=db.loadStat('getUserById');
 const getPermForUser=db.loadStat('getPermForUser');
+const listTables=db.loadStat('listTables').pluck(true);
 
 // setup entrypoint
 module.exports=exports=function(app) {
@@ -78,8 +79,6 @@ module.exports=exports=function(app) {
 			// attempt to authenticate someone
 			let user=await auth.authUser(req.body.login, req.body.password);
 			if(user) {
-				// save their session
-				req.session=user;
 				// give them a cookie
 				let cookie=await auth.createToken(['user'], user);
 				res.cookie('session', cookie, req.body.rememberme?{maxAge: ms(auth.duration)-ms('1h')}:undefined);
@@ -118,5 +117,45 @@ module.exports=exports=function(app) {
 	//TODO revoke a token
 	app.get('/api/token/revoke', (req, res) => {
 		throw new Error("Unimplemented");
-	})
+	});
+	
+	//BEGIN permission checker
+	const permCheck={};
+	// check if session has full access
+	permCheck.full=(req, res) => {
+		const s=res.locals.session;
+		return s && (s.scopes.includes('api') || (s.scopes.includes('user') && s.user.perm.admin));
+	};
+	// check if session has full read access
+	permCheck.read=(req, res) => {
+		const s=res.locals.session;
+		if(!s) return false;
+		if(s.scopes.includes('api') || s.scopes.includes('read')) return true;
+		if((s.scopes.includes('user') || s.scopes.includes('read_user')) && (s.user.perm.admin || s.user.perm.bde)) return true;
+		return false;
+	};
+	//END permission checker
+	
+	//BEGIN raw db manipulation
+	// list all tables
+	app.get('/api/db/tables/list', (req, res) => {
+		if(!permCheck.full(req, res)) throw new Error("no permissions");
+		res.json(listTables.all());
+	});
+	
+	// get table fields
+	app.get('/api/db/tables/:table/fields', (req, res) => {
+		if(!permCheck.full(req, res)) throw new Error("no permissions");
+		res.json(db.pragma('table_info('+req.params.table+')'));
+	});
+	// select from table
+	app.get('/api/db/tables/:table/select', (req, res) => {
+		if(!permCheck.full(req, res)) throw new Error("no permissions");
+		res.json(db.prepare('SELECT * FROM '+req.params.table+';').all());
+	});
+	app.get('/api/db/tables/:table/select/:fields', (req, res) => {
+		if(!permCheck.full(req, res)) throw new Error("no permissions");
+		res.json(db.prepare('SELECT '+req.params.fields+' FROM '+req.params.table+';').all());
+	});
+	//END raw db manipulation
 };

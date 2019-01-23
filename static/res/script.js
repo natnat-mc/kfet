@@ -5,19 +5,22 @@ const ajax=function ajax(url, method='GET', data=null, callback) {
 	const xhr=new XMLHttpRequest();
 	xhr.open(method, url, true);
 	if(callback) {
-		xhr.onload=xhr => callback(undefined, xhr);
+		xhr.onload=_ => callback(undefined, xhr);
 		xhr.onerror=err => callback(err);
 		return xhr.send(data);
 	} else {
 		return new Promise((ok, ko) => {
-			xhr.onload=ok;
+			xhr.onload=() => {
+				if(xhr.status>=200 && xhr.status<300) ok(xhr);
+				else ko(xhr);
+			};
 			xhr.onerror=ko;
 			return xhr.send(data);
 		});
 	}
 };
 ajax.get=function get(url, callback) {
-	return ajax(url, 'GET', null, callback);
+	return ajax(url, 'GET', null, callback).then(a => a.responseText);
 };
 ajax.post=function post(url, data, callback) {
 	return ajax(url, 'POST', data, callback);
@@ -29,9 +32,27 @@ ajax.sync=function sync(url, method='GET', data=null) {
 	return xhr;
 };
 ajax.sync.get=function get(url) {
-	return ajax.sync(url, 'GET', null);
+	return ajax.sync(url, 'GET', null).responseText;
 };
 return ajax;
+})();
+
+// api.js
+_G.api=(() => {
+// @depends ajax
+const api={};
+api.getURL=(base, params, qs={}) => {
+	base.replace(/:([^/]+)/g, (_, k) => console.log(k));
+	let url='/api'+base.replace(/:([^/]+)/g, (_, k) => params[k]);
+	let q=[];
+	for(let k in qs) q.push(encodeURIComponent(k)+'='+encodeURIComponent(qs[k]));
+	if(q.length) url+='?'+q;
+	return url;
+};
+api.get=(base, params, qs) => {
+	return _G.ajax.get(api.getURL(base, params, qs)).then(JSON.parse);
+};
+return api;
 })();
 
 // ejs.js
@@ -43,7 +64,43 @@ _G.ejs=(() => {
 _G.ejs_loader=(() => {
 // @depends ejs
 // @depends ajax
+const cache=Object.create(null);
 ejs.fileLoader=function(path) {
-	return _G.ajax.sync.get('/views/'+path).responseText;
+	if(!cache[path]) cache[path]=_G.ajax.sync.get('/views/'+path);
+	return cache[path];
 };
+const preload=function(path) {
+	if(!cache[path]) _G.ajax.get('/views/'+path).then(code => cache[path]=code);
+};
+const invalidate=function(path) {
+	if(path) delete cache[path];
+	else for(let k in cache) delete cache[k];
+};
+return {
+	preload,
+	cache,
+	invalidate
+};
+})();
+
+// test.js
+_G.test=(() => {
+// @depends ejs_loader
+// @depends ejs
+// @depends api
+( async () => {
+	await Promise.all(['dbList.ejs', 'dbFields.ejs', 'dbValues.ejs'].map(_G.ejs_loader.preload));
+	let tableList=await _G.api.get('/db/tables/list');
+	{
+		let code=await ejs.renderFile('dbList.ejs', {list: tableList});
+		document.body.innerHTML+=code;
+	}
+	let tables=Object.create(null);
+	for(let table of tableList) {
+		tables[table]={
+			fields: await _G.api.get('/db/tables/:table/fields', {table})
+		};
+	}
+	console.log(tables);
+})();
 })();
