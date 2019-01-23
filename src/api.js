@@ -39,18 +39,17 @@ module.exports=exports=function(app) {
 		if(req.query.token) {
 			let token=auth.validateToken(req.query.token);
 			if(token) {
-				let user, perm;
+				let user;
 				if(token.user) {
 					user=getUserById.get(token.user);
-					perm={};
+					user.perm={};
 					getPermForUser.all(token.user).forEach(function({id, name}) {
-						perm.name=true;
-						perm.id=true;
+						user.perm[name]=true;
+						user.perm[id]=true;
 					});
 				}
 				res.locals.session={
 					user,
-					perm,
 					token,
 					scopes: token.scopes
 				};
