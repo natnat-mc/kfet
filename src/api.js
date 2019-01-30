@@ -38,8 +38,8 @@ module.exports=exports=function(app) {
 	// read token and get session
 	app.use((req, res, next) => {
 		if(req.query.token) {
-			let token=auth.validateToken(req.query.token);
-			if(token) {
+			try {
+				let token=auth.validateToken(req.query.token);
 				let user;
 				if(token.user) {
 					user=getUserById.get(token.user);
@@ -54,7 +54,8 @@ module.exports=exports=function(app) {
 					token,
 					scopes: token.scopes
 				};
-			} else {
+			} catch(e) {
+				console.error(e);
 				// send an error message
 				if(req.webui) {
 					// for WebUI users, delete the cookie and redirect to the main page
