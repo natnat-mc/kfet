@@ -1,0 +1,37 @@
+<table id="dbValues">
+	<caption><%= name %></caption>
+	<thead>
+		<tr>
+			<% for(let field of fields) { %>
+				<% let type=field.type.toLowerCase(); %>
+				<th class="field"><%= field.name %></th>
+			<% } %>
+			<% if(canEdit) { %>
+				<th>actions</th>
+			<% } %>
+		</tr>
+	</thead>
+	<tbody>
+		<% for(let line of lines) { %>
+			<tr>
+				<% for(let field of fields) { %>
+					<% let value=line[field.name]; %>
+					<td class="value <%= field.type.toLowerCase() %>"><%= value %></td>
+				<% } %>
+				<% if(canEdit) { %>
+					<td class="action"><a class="delete">delete</a> <a class="update">update</a></td>
+				<% } %>
+			</tr>
+		<% } %>
+	</tbody>
+	<tfoot>
+		<tr>
+			<% for(let field of fields) { %>
+				<td><input class="field" data-field="<%- field.name %>" type="text" /></td>
+			<% } %>
+			<% if(canEdit) { %>
+				<td><a class="insert">insert</a></td>
+			<% } %>
+		</tr>
+	</tfoot>
+</table>

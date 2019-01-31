@@ -152,11 +152,42 @@ module.exports=exports=function(app) {
 	// select from table
 	app.get('/api/db/tables/:table/select', (req, res) => {
 		if(!permCheck.full(req, res)) throw new Error("no permissions");
-		res.json(db.prepare('SELECT * FROM '+req.params.table+';').all());
+		let lines=db.prepare('SELECT * FROM '+req.params.table+';').all();
+		lines.forEach(line => {
+			for(let k in line) {
+				if(line[k] instanceof Buffer) line[k]=line[k].toString('hex');
+			}
+		});
+		res.json(lines);
 	});
 	app.get('/api/db/tables/:table/select/:fields', (req, res) => {
 		if(!permCheck.full(req, res)) throw new Error("no permissions");
 		res.json(db.prepare('SELECT '+req.params.fields+' FROM '+req.params.table+';').all());
 	});
+	app.post('/api/db/tables/:table/insert', (req, res) => {
+		if(!permCheck.full(req, res)) throw new Error("no permissions");
+		let keys=Object.keys(req.body);
+		let sql='INSERT INTO '+req.params.table+'('+keys.join(',')+') VALUES ('+keys.map(n => '$'+n).join(',')+');';
+		db.prepare(sql).run(req.body);
+		res.json({status: 'OK'});
+	});
+	app.post('/api/db/tables/:table/delete', (req, res) => {
+		if(!permCheck.full(req, res)) throw new Error("no permissions");
+		let keys=Object.keys(req.body);
+		let sql='DELETE FROM '+req.params.table+' WHERE '+keys.map(n => n+'=$'+n).join(' AND ')+';';
+		db.prepare(sql).run(req.body);
+		res.json({status: 'OK'});
+	});
+	app.post('/api/db/tables/:table/update', (req, res) => {
+		if(!permCheck.full(req, res)) throw new Error("no permissions");
+		let whK=Object.keys(req.body.where || {});
+		let stK=Object.keys(req.body.set);
+		let sql='UPDATE '+req.params.table+' SET '+stK.map(n => n+'=$'+n).join(', ')+' WHERE '+whK.map(n => n+'=$_'+n).join(' AND ')+';';
+		let o=Object.assign({}, req.body.set);
+		whK.forEach(k => o['_'+k]=req.body.where[k]);
+		console.log(sql, o);
+		db.prepare(sql).run(o);
+		res.json({status: 'OK'});
+	})
 	//END raw db manipulation
 };
