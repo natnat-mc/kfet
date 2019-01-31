@@ -1,0 +1,6 @@
+DROP TABLE menus;
+
+CREATE TABLE priceList (
+	name STRING PRIMARY KEY,
+	value NUMBER NOT NULL
+);
