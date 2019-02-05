@@ -1,4 +1,4 @@
-// @depends ajax
+// @depends "ajax"
 
 const api={};
 

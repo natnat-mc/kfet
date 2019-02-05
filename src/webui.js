@@ -22,4 +22,14 @@ module.exports=exports=function(app) {
 	
 	//NOTICE this is debug, baka!
 	app.get('/', render('loginBoxTest'));
+	
+	// standard routes
+	app.get('/dbEditor', (req, res, next) => {
+		if(!res.locals.session || !res.locals.session.user || !res.locals.session.user.perm.admin) {
+			res.status(401).render('permissionError', {
+				missingPerm: ['admin']
+			});
+		}
+		next();
+	}, render('dbEditor'));
 };

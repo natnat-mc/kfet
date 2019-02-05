@@ -8,7 +8,7 @@ const regex={
 
 class Script {
 	constructor(name, map) {
-		this.name=name;
+		this.name=regex.name.exec(name)[1];
 		this.content=fs.readFileSync('src/js/'+name, 'utf8');
 		this.deps=[];
 		this.map=map;
@@ -37,6 +37,7 @@ class ScriptMap {
 		}
 		this.list.push(script);
 		this.map[script.name]=script;
+		console.log(script.name, script.deps);
 	}
 	
 	resolve() {

@@ -1,6 +1,10 @@
-// @depends ejs_loader
-// @depends ejs
-// @depends api
+// @depends "ejs_loader"
+// @depends "ejs"
+// @depends "api"
+
+if(location.pathname!='/dbEditor') return;
+
+const main=document.querySelector('main');
 
 let drawTable, _update, _delete, _insert;
 let tName, fields, lines, canEdit;
@@ -100,8 +104,8 @@ drawTable=async function(name) {
 	let tableList=await _G.api.get('/db/tables/list');
 	
 	let code=await ejs.renderFile('dbList.ejs', {list: tableList});
-	document.body.innerHTML+=code;
-	document.body.appendChild(document.createElement('div')).setAttribute('id', 'dbValues');
+	main.innerHTML+=code;
+	main.appendChild(document.createElement('div')).setAttribute('id', 'dbValues');
 	
 	document.querySelectorAll('#dbList li').forEach(async elem => {
 		let name=elem.innerText;

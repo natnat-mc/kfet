@@ -1,5 +1,5 @@
-// @depends ejs
-// @depends ajax
+// @depends "ejs"
+// @depends "ajax"
 const cache=Object.create(null);
 ejs.fileLoader=function(path) {
 	if(!cache[path]) cache[path]=_G.ajax.sync.get('/views/'+path);
